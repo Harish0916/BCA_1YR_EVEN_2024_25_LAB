@@ -14,9 +14,8 @@ app.use(cors());
 app.use(
   http.createServer(async (req, res) => {
     if (req.url.startsWith('/weather') && req.method === 'GET') {
-      const urlParams = new URL(req.url, `http://${req.headers.host}`);
-      const city = urlParams.searchParams.get('city') || 'London';
-
+      const city = new URLSearchParams(req.url.split('?')[1]).get('city') || 'London';
+      console.log(city)
       try {
           const weatherUrl = `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}&aqi=no`;
           const response = await fetch(weatherUrl);
