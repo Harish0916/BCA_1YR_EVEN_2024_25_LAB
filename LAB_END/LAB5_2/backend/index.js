@@ -13,20 +13,25 @@ const app = connect();
 app.use(cors());
 app.use(
   http.createServer(async (req, res) => {
-    if (req.url === "/weather" && req.method === "GET") {
+    if (req.url.startsWith('/weather') && req.method === 'GET') {
       const urlParams = new URL(req.url, `http://${req.headers.host}`);
-      const city = urlParams.searchParams.get("city") || "London";
+      const city = urlParams.searchParams.get('city') || 'London';
+
       try {
-        const weatherUrl = `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}`;
-        const response = await fetch(weatherUrl);
-        const data = await response.json();
-        res.end(JSON.stringify(data));
+          const weatherUrl = `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}&aqi=no`;
+          const response = await fetch(weatherUrl);
+          const data = await response.json();
+
+          res.writeHead(200, { 'Content-Type': 'application/json'});
+          res.end(JSON.stringify(data));
       } catch (error) {
-        res.end(JSON.stringify({ error: "Failed to fetch weather data" }));
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Failed to fetch weather data' }));
       }
-    } else {
-      res.end("Route not found");
-    }
+  } else {
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('Route not found');
+  }
   })
 );
 app.listen(PORT, () =>
